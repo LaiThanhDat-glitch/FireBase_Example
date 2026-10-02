@@ -37,14 +37,20 @@ public class DetailActivity extends AppCompatActivity {
             txtContent.setText(article.getContent());
             txtView.setText("Views: " + article.getView());
 
-            // Giải mã hiển thị ảnh Base64
-            String base64Image = article.getImg_cover();
-            if (base64Image != null && !base64Image.isEmpty()) {
-                try {
-                    byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
-                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                    imgCover.setImageBitmap(decodedByte);
-                } catch (Exception ignored) {}
+            String imageName = article.getImg_cover();
+            if (imageName != null && !imageName.trim().isEmpty()) {
+                int resId = getResources().getIdentifier(
+                        imageName.trim().toLowerCase(),
+                        "drawable",
+                        getPackageName()
+                );
+                if (resId != 0) {
+                    imgCover.setImageResource(resId);
+                } else {
+                    imgCover.setImageResource(android.R.drawable.ic_menu_gallery);
+                }
+            } else {
+                imgCover.setImageResource(android.R.drawable.ic_menu_gallery);
             }
         }
     }

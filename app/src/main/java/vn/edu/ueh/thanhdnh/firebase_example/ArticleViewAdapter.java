@@ -1,9 +1,6 @@
 package vn.edu.ueh.thanhdnh.firebase_example;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +29,6 @@ public class ArticleViewAdapter extends RecyclerView.Adapter<ArticleViewHolder> 
   @NonNull
   @Override
   public ArticleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-    // Đổi R.layout.contact_list thành file layout item bài viết của bạn (ví dụ: R.layout.article_item hoặc R.layout.contact_list nếu chưa đổi tên layout)
     View customView = mInflater.inflate(R.layout.article_item, parent, false);
     return new ArticleViewHolder(customView, this);
   }
@@ -41,23 +37,26 @@ public class ArticleViewAdapter extends RecyclerView.Adapter<ArticleViewHolder> 
   public void onBindViewHolder(@NonNull ArticleViewHolder holder, int position) {
     Article currentArticle = articles.get(position);
 
-    // Gán dữ liệu theo các thuộc tính trên ảnh: title, content, views
     holder.getTxtTitle().setText(currentArticle.getTitle());
     holder.getTxtContent().setText(currentArticle.getContent());
     holder.getTxtView().setText("Views: " + currentArticle.getView());
 
-    // Xử lý hiển thị img_cover
-    String imgCover = currentArticle.getImg_cover();
-    if (imgCover != null && !imgCover.isEmpty()) {
-      // Trường hợp ảnh lưu dưới dạng Base64
-      try {
-        byte[] decodedString = Base64.decode(imgCover, Base64.DEFAULT);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        holder.getImgCover().setImageBitmap(decodedByte);
-      } catch (Exception e) {
-        // Nếu bạn dùng thư viện tải URL như Glide hay Picasso:
-        // Glide.with(context).load(imgCover).into(holder.getImgCover());
+    // Xử lý lấy ảnh từ res/drawable bằng tên file lưu trên Firebase
+    String imageName = currentArticle.getImg_cover();
+    if (imageName != null && !imageName.trim().isEmpty()) {
+      // Tìm resource ID dựa trên tên chuỗi (loại bỏ đuôi file và khoảng trắng)
+      String cleanImageName = imageName.trim().toLowerCase();
+      int resId = context.getResources().getIdentifier(cleanImageName, "drawable", context.getPackageName());
+
+      if (resId != 0) {
+        // Tìm thấy ảnh trong drawable
+        holder.getImgCover().setImageResource(resId);
+      } else {
+        // Tên file không khớp thì hiện icon mặc định
+        holder.getImgCover().setImageResource(android.R.drawable.ic_menu_gallery);
       }
+    } else {
+      holder.getImgCover().setImageResource(android.R.drawable.ic_menu_gallery);
     }
   }
 
