@@ -19,7 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
   FirebaseFirestore db;
   Button btAdd, btShow;
-  EditText etTitle, etContent, etImgCover;
+  EditText etId, etTitle, etContent, etImgCover;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     btAdd = findViewById(R.id.btAdd);
     btShow = findViewById(R.id.btShow);
 
-    // Ánh xạ lại các ô nhập liệu cho Article (chỉnh lại ID nếu layout XML đặt tên khác)
+    // Ánh xạ các trường
+    etId = findViewById(R.id.etId);
     etTitle = findViewById(R.id.etTitle);
     etContent = findViewById(R.id.etContent);
     etImgCover = findViewById(R.id.etImgCover);
@@ -50,21 +51,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
   @Override
   public void onClick(View view) {
     if (view.getId() == R.id.btAdd) {
+      String customId = etId.getText().toString().trim(); // ID thủ công người dùng nhập
       String title = etTitle.getText().toString().trim();
       String content = etContent.getText().toString().trim();
       String imgCover = etImgCover.getText().toString().trim();
-      int initialView = 0; // Lượt xem ban đầu là 0
+      int initialView = 0;
 
+      if (customId.isEmpty()) {
+        Toast.makeText(this, "Vui lòng nhập ID cho bài viết!", Toast.LENGTH_SHORT).show();
+        return;
+      }
       if (title.isEmpty()) {
-        Toast.makeText(this, "Vui lòng nhập tiêu đề", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Vui lòng nhập tiêu đề!", Toast.LENGTH_SHORT).show();
         return;
       }
 
-      // Đẩy object Article lên collection "articles" trên Firestore
-      Article newArticle = new Article(title, content, imgCover, initialView);
+      // Tạo Article với ID thủ công vừa nhập
+      Article newArticle = new Article(customId, title, content, imgCover, initialView);
+
+      // Lệnh .add() sẽ để Firebase tự sinh Document ID ngẫu nhiên
       db.collection("articles").add(newArticle)
               .addOnSuccessListener(documentReference -> {
                 Toast.makeText(MainActivity.this, "Thêm bài viết thành công!", Toast.LENGTH_SHORT).show();
+                etId.setText("");
                 etTitle.setText("");
                 etContent.setText("");
                 etImgCover.setText("");

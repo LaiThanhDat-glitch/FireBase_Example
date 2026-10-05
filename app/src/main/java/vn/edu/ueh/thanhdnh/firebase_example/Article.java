@@ -1,9 +1,11 @@
 package vn.edu.ueh.thanhdnh.firebase_example;
 
+import com.google.firebase.firestore.Exclude;
 import java.io.Serializable;
 
 public class Article implements Serializable {
-  private String id; // ID của document trên Firestore
+  private String docId; // Chỉ lưu trong RAM của máy, không đẩy lên Firestore
+  private String id;    // ID thủ công do bạn nhập (sẽ lưu lên Firestore)
   private String title;
   private String content;
   private String img_cover;
@@ -19,11 +21,23 @@ public class Article implements Serializable {
     this.view = view;
   }
 
-  public Article(String title, String content, String img_cover, int view) {
+  public Article(String docId, String id, String title, String content, String img_cover, int view) {
+    this.docId = docId;
+    this.id = id;
     this.title = title;
     this.content = content;
     this.img_cover = img_cover;
     this.view = view;
+  }
+
+  // Đánh dấu @Exclude để Firebase bỏ qua docId, không tạo trường này trên Firestore
+  @Exclude
+  public String getDocId() {
+    return docId;
+  }
+
+  public void setDocId(String docId) {
+    this.docId = docId;
   }
 
   public String getId() { return id; }

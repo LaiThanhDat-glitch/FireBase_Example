@@ -36,10 +36,10 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder {
           Context context = v.getContext();
 
           // 1. Tăng view lên +1 trực tiếp trên Firestore (atomic increment)
-          if (clickedArticle.getId() != null) {
+          if (clickedArticle.getDocId() != null) {
             FirebaseFirestore.getInstance()
                     .collection("articles")
-                    .document(clickedArticle.getId())
+                    .document(clickedArticle.getDocId()) // Trỏ đúng vào DocID ngẫu nhiên của Firestore
                     .update("view", FieldValue.increment(1));
           }
 

@@ -60,10 +60,12 @@ public class ShowDataActivity extends AppCompatActivity {
 
                 if (snapshots != null) {
                     articles.clear();
+                    // Trong hàm onEvent của ShowDataActivity.java:
                     for (QueryDocumentSnapshot q : snapshots) {
                         Map<String, Object> data = q.getData();
 
-                        String docId = q.getId(); // Lấy ID document
+                        String randomDocId = q.getId(); // Mã ngẫu nhiên của Firebase
+                        String customId = data.get("id") != null ? data.get("id").toString() : ""; // ID bạn nhập
                         String title = data.get("title") != null ? data.get("title").toString() : "";
                         String content = data.get("content") != null ? data.get("content").toString() : "";
                         String imgCover = data.get("img_cover") != null ? data.get("img_cover").toString() : "";
@@ -73,7 +75,7 @@ public class ShowDataActivity extends AppCompatActivity {
                             view = ((Number) data.get("view")).intValue();
                         }
 
-                        Article article = new Article(docId, title, content, imgCover, view);
+                        Article article = new Article(randomDocId, customId, title, content, imgCover, view);
                         articles.add(article);
                     }
                     adapter.update(articles);
